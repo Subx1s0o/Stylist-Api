@@ -14,9 +14,6 @@ export const StageSchema = SchemaFactory.createForClass(StageDTO);
 
 @Schema()
 export class ServicesDocument extends Document {
-  @Prop({ type: String, required: true })
-  href: string;
-
   @Prop({ type: Map, of: String, required: true })
   title: Map<string, string>;
 
@@ -29,8 +26,8 @@ export class ServicesDocument extends Document {
   @Prop({ type: Map, of: String, required: true })
   result: Map<string, string>;
 
-  @Prop({ type: Number, required: true })
-  price: number;
+  @Prop({ type: Number, required: false })
+  price?: number;
 
   @Prop({ type: String, enum: ['online', 'offline'], required: true })
   format: 'online' | 'offline';
@@ -44,9 +41,12 @@ export class ServicesDocument extends Document {
   @Prop({
     type: Map,
     of: StageSchema,
-    required: true,
+    required: false,
   })
   stages: Record<number, StageDTO>;
+
+  @Prop({ type: String, required: false })
+  imageUrl: string;
 }
 
 export const ServicesSchema = SchemaFactory.createForClass(ServicesDocument);

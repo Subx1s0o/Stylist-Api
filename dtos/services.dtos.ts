@@ -32,7 +32,8 @@ export class CreateDTO {
 
   @IsNumber()
   @IsNotEmpty()
-  price: number;
+  @IsOptional()
+  price?: number;
 
   @IsEnum(Format)
   @IsNotEmpty()
@@ -51,6 +52,7 @@ export class CreateDTO {
   attention?: string;
 
   @IsObject()
+  @IsOptional()
   @IsNotEmpty()
-  stages: Record<number, string>;
+  stages?: Record<number, string>;
 }
