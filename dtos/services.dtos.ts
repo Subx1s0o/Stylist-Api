@@ -1,4 +1,11 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 enum Format {
   ONLINE = 'online',
@@ -40,5 +47,10 @@ export class CreateDTO {
   result: string;
 
   @IsString()
+  @IsOptional()
   attention?: string;
+
+  @IsObject()
+  @IsNotEmpty()
+  stages: Record<number, string>;
 }
