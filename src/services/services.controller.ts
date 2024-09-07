@@ -64,4 +64,9 @@ export class ServicesController {
     const filter = { category: 'style', ...(format ? { format } : {}) };
     return this.servicesService.findAll(filter, page, limit);
   }
+
+  @Get('makeup/:id')
+  async getMakeUpServicebyId(@Param('id') id: string) {
+    return this.servicesService.findOne({ _id: id });
+  }
 }
