@@ -65,8 +65,8 @@ export class ServicesController {
     return this.servicesService.findAll(filter, page, limit);
   }
 
-  @Get('makeup/:id')
-  async getMakeUpServicebyId(@Param('id') id: string) {
+  @Get(':id')
+  async getServicebyId(@Param('id') id: string) {
     return this.servicesService.findOne({ _id: id });
   }
 }

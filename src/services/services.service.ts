@@ -1,10 +1,10 @@
 import CloudinaryService from '@app/common/cloudinary/cloudinary.service';
-import { AbstractRepository } from '@app/common/database/abstract.repository';
+import AbstractRepository from '@app/common/database/abstract.repository';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { MET } from 'bing-translate-api';
 import { CreateDTO } from 'dtos/services.dtos';
 import { Model } from 'mongoose';
+import Translations from 'utils/translations';
 import { ServicesDocument } from './services.schema';
 
 @Injectable()
@@ -15,75 +15,35 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
     @InjectModel(ServicesDocument.name)
     protected readonly model: Model<ServicesDocument>,
     protected readonly cloudinary: CloudinaryService,
+    protected readonly translations: Translations,
   ) {
     super(model);
-  }
-
-  private async createTranslationMap(
-    text: string,
-  ): Promise<Map<string, string>> {
-    const translations = await this.translate(text);
-    return new Map(Object.entries(translations));
-  }
-
-  private async translate(data: string): Promise<{ uk: string; en: string }> {
-    try {
-      const translations = await MET.translate(data, 'uk', 'en');
-      const englishTranslation =
-        translations[0]?.translations?.[0]?.text || data;
-      return {
-        uk: data,
-        en: englishTranslation,
-      };
-    } catch (error) {
-      this.logger.error('Error translating text', error);
-      return {
-        uk: data,
-        en: data,
-      };
-    }
-  }
-
-  private async translateStages(
-    stages: Record<number, string> | undefined,
-  ): Promise<Record<number, { uk: string; en: string }>> {
-    const translatedStages: Record<number, { uk: string; en: string }> = {};
-
-    if (!stages) {
-      return translatedStages;
-    }
-
-    for (const [key, stage] of Object.entries(stages)) {
-      const { uk, en } = await this.translate(stage);
-      translatedStages[Number(key)] = { uk, en };
-    }
-
-    return translatedStages;
   }
 
   async createService(
     data: CreateDTO,
     file: Express.Multer.File,
   ): Promise<ServicesDocument> {
-    const titleMap = await this.createTranslationMap(data.title);
-    const resultMap = await this.createTranslationMap(data.result);
-    const attentionMap = data.attention
-      ? await this.createTranslationMap(data.attention)
-      : undefined;
-    const durationConsultationMap = await this.createTranslationMap(
-      data.duration_consultation,
+    const fieldsToTranslate = {
+      title: data.title,
+      result: data.result,
+      attention: data.attention,
+      duration_consultation: data.duration_consultation,
+      duration_work: data.duration_work,
+    };
+
+    const translatedFields = await this.translations.translateFields(
+      fieldsToTranslate,
+      {},
     );
-    const durationWorkMap = await this.createTranslationMap(data.duration_work);
-    const translatedStages = await this.translateStages(data.stages);
+    const translatedStages = await this.translations.translateStages(
+      data.stages,
+    );
 
     const newService = {
-      title: titleMap,
-      duration_consultation: durationConsultationMap,
-      duration_work: durationWorkMap,
+      ...translatedFields,
       price: data.price,
       format: data.format,
-      result: resultMap,
-      attention: attentionMap,
       category: data.category,
       stages: translatedStages,
       imageUrl: '',
@@ -99,7 +59,7 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
           'services',
         );
 
-        const imageUrl = uploadResult.url;
+        const imageUrl = uploadResult.secure_url;
         createdService.imageUrl = imageUrl;
         await createdService.save();
       } catch (error) {
@@ -121,34 +81,27 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
       throw new Error('Service not found');
     }
 
-    const titleMap = data.title
-      ? await this.createTranslationMap(data.title)
-      : existingService.title;
-    const resultMap = data.result
-      ? await this.createTranslationMap(data.result)
-      : existingService.result;
-    const attentionMap = data.attention
-      ? await this.createTranslationMap(data.attention)
-      : existingService.attention;
-    const durationConsultationMap = data.duration_consultation
-      ? await this.createTranslationMap(data.duration_consultation)
-      : existingService.duration_consultation;
-    const durationWorkMap = data.duration_work
-      ? await this.createTranslationMap(data.duration_work)
-      : existingService.duration_work;
+    const fieldsToTranslate = {
+      title: data.title,
+      result: data.result,
+      attention: data.attention,
+      duration_consultation: data.duration_consultation,
+      duration_work: data.duration_work,
+    };
+
+    const translatedFields = await this.translations.translateFields(
+      fieldsToTranslate,
+      existingService,
+    );
     const translatedStages = data.stages
-      ? await this.translateStages(data.stages)
+      ? await this.translations.translateStages(data.stages)
       : existingService.stages;
 
     const updatedService: any = {
       ...existingService.toObject(),
-      title: titleMap,
-      duration_consultation: durationConsultationMap,
-      duration_work: durationWorkMap,
+      ...translatedFields,
       price: data.price || existingService.price,
       format: data.format || existingService.format,
-      result: resultMap,
-      attention: attentionMap,
       category: data.category || existingService.category,
       stages: translatedStages,
     };
@@ -175,7 +128,7 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
           'services',
         );
 
-        updatedService.imageUrl = uploadResult.url;
+        updatedService.imageUrl = uploadResult.secure_url;
       } catch (error) {
         this.logger.error('Error uploading file: ' + error.message);
         throw new Error('Error uploading file');
