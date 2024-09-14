@@ -13,14 +13,12 @@ export class ContactsController {
   @Post()
   async sendFormData(@Body() data) {
     const chatIds = await this.adminService.findAllChatIds();
-    console.log(chatIds);
-    console.log(data);
 
     chatIds.map(async (chatId) => {
       await this.bot.telegram.sendMessage(
         chatId,
         `
-        Привіт, тобі надіслали нове повідомлення!\n\nІм'я:${data.username}\nЕмейл:${data.email}\nСоц. Мережа:${data.link}`,
+        Привіт, тобі надіслали нове повідомлення!\n\nІм'я:${data.name}\nЕмейл:${data.email}\nСоц. Мережа:${data.link}`,
       );
     });
   }
