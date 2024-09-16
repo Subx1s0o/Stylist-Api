@@ -1,9 +1,7 @@
-import { Logger, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { Document, FilterQuery, Model, Types } from 'mongoose';
 
 export default abstract class AbstractRepository<TDocument extends Document> {
-  protected abstract readonly logger: Logger;
-
   constructor(protected readonly model: Model<TDocument>) {}
 
   private removeVersionField(document: any): any {
@@ -24,7 +22,6 @@ export default abstract class AbstractRepository<TDocument extends Document> {
   async findOne(filterQuery: FilterQuery<TDocument>): Promise<TDocument> {
     const document = await this.model.findOne(filterQuery).lean();
     if (!document) {
-      this.logger.warn('Document was not found with filterQuery', filterQuery);
       throw new NotFoundException('Document was not found');
     }
     return this.removeVersionField(document) as TDocument;
@@ -47,10 +44,6 @@ export default abstract class AbstractRepository<TDocument extends Document> {
         this.model.countDocuments(filterQuery),
       ]);
 
-      if (services.length === 0) {
-        this.logger.warn('No services found with the given filter query');
-      }
-
       const totalPages = Math.ceil(total / limit);
 
       return {
@@ -59,7 +52,6 @@ export default abstract class AbstractRepository<TDocument extends Document> {
         totalPages,
       };
     } catch (error) {
-      this.logger.error('Error occurred while fetching services', error);
       throw new Error('An error occurred while fetching services');
     }
   }
@@ -67,7 +59,6 @@ export default abstract class AbstractRepository<TDocument extends Document> {
   async deleteOne(filterQuery: FilterQuery<TDocument>): Promise<TDocument> {
     const document = await this.model.findOneAndDelete(filterQuery).lean();
     if (!document) {
-      this.logger.warn('Document was not found with filterQuery', filterQuery);
       throw new NotFoundException('Document was not found');
     }
     return this.removeVersionField(document) as TDocument;

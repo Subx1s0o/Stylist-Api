@@ -1,4 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  InternalServerErrorException,
+  Post,
+} from '@nestjs/common';
 import { InjectBot } from 'nestjs-telegraf';
 import { AdminService } from 'src/admin/admin.service';
 import { Context, Telegraf } from 'telegraf';
@@ -12,14 +17,27 @@ export class ContactsController {
 
   @Post()
   async sendFormData(@Body() data) {
-    const chatIds = await this.adminService.findAllChatIds();
-
-    chatIds.map(async (chatId) => {
-      await this.bot.telegram.sendMessage(
-        chatId,
-        `
-        Привіт, тобі надіслали нове повідомлення!\n\nІм'я:${data.name}\nЕмейл:${data.email}\nСоц. Мережа:${data.link}`,
+    try {
+      const chatIds = await this.adminService.findAllChatIds();
+      await Promise.all(
+        chatIds.map(async (chatId) => {
+          await this.bot.telegram.sendMessage(
+            chatId,
+            `<b>Привіт!</b> Тобі надіслали нове повідомлення!\n\n<b>Ім'я:</b> ${data.name}\n\n<b>Емейл:</b> ${data.email}\n${data.link ? `<b>Соц. Мережа:\n<a href="${data.link}">${data.link}</a>` : ''}
+            `,
+            { parse_mode: 'HTML' },
+          );
+        }),
       );
-    });
+      return {
+        status: 201,
+        message: 'Successfully sended',
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(
+        'Error while sending message, please try later.',
+      );
+    }
   }
 }

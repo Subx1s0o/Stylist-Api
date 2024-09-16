@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Ctx, Hears, On, Update } from 'nestjs-telegraf';
+import { Ctx, Hears, On, Start, Update } from 'nestjs-telegraf';
 import { AdminService } from 'src/admin/admin.service';
 import { Context } from 'telegraf';
 
@@ -13,6 +13,13 @@ export class BotUpdate {
   private chatTempUsername = new Map<number, string>();
 
   constructor(private readonly adminService: AdminService) {}
+
+  @Start()
+  async sayWelcome(@Ctx() ctx: Context) {
+    ctx.reply(
+      'Привіт Маруся, вітаю тебе!, це початок нашої плідної співпраці!',
+    );
+  }
 
   @Hears('login')
   async startLogin(@Ctx() ctx: Context) {
@@ -53,7 +60,7 @@ export class BotUpdate {
         );
 
         if (admin) {
-          await ctx.reply('Successfully authenticated.');
+          await ctx.reply('Успішно аутентифіковано).');
           this.chatState.set(chatId, 'authorized');
         } else {
           await ctx.reply('Помилка аутентифікації, спробуйте ще раз');

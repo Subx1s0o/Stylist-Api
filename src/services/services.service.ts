@@ -1,6 +1,10 @@
 import CloudinaryService from '@app/common/cloudinary/cloudinary.service';
 import AbstractRepository from '@app/common/database/abstract.repository';
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateDTO } from 'dtos/services.dtos';
 import { Model } from 'mongoose';
@@ -9,8 +13,6 @@ import { ServicesDocument } from './services.schema';
 
 @Injectable()
 export class ServicesService extends AbstractRepository<ServicesDocument> {
-  protected readonly logger = new Logger(ServicesService.name);
-
   constructor(
     @InjectModel(ServicesDocument.name)
     protected readonly model: Model<ServicesDocument>,
@@ -63,8 +65,7 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
         createdService.imageUrl = imageUrl;
         await createdService.save();
       } catch (error) {
-        this.logger.error('Error uploading file: ' + error.message);
-        throw new Error('Error uploading file');
+        throw new InternalServerErrorException('Error uploading file');
       }
     }
 
@@ -78,7 +79,7 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
   ): Promise<ServicesDocument> {
     const existingService = await this.model.findById(id);
     if (!existingService) {
-      throw new Error('Service not found');
+      throw new NotFoundException('Service not found');
     }
 
     const fieldsToTranslate = {
@@ -130,8 +131,7 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
 
         updatedService.imageUrl = uploadResult.secure_url;
       } catch (error) {
-        this.logger.error('Error uploading file: ' + error.message);
-        throw new Error('Error uploading file');
+        throw new InternalServerErrorException('Error uploading file');
       }
     }
 
@@ -140,7 +140,7 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
     });
 
     if (!updated) {
-      throw new Error('Error updating service');
+      throw new InternalServerErrorException('Error updating service');
     }
 
     return updated;
