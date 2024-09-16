@@ -23,7 +23,7 @@ export class ContactsController {
         chatIds.map(async (chatId) => {
           await this.bot.telegram.sendMessage(
             chatId,
-            `<b>Привіт!</b> Тобі надіслали нове повідомлення!\n\n<b>Ім'я:</b> ${data.name}\n\n<b>Емейл:</b> ${data.email}\n${data.link ? `<b>Соц. Мережа:\n<a href="${data.link}">${data.link}</a>` : ''}
+            `<b>Привіт!</b> Тобі надіслали нове повідомлення!\n\n<b>Ім'я:</b> ${data.name}\n\n<b>Емейл:</b> ${data.email}\n\n${data.link ? `<b>Соц. Мережа:</b> ${data.link}` : ''}
             `,
             { parse_mode: 'HTML' },
           );
@@ -34,7 +34,6 @@ export class ContactsController {
         message: 'Successfully sended',
       };
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException(
         'Error while sending message, please try later.',
       );
