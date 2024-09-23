@@ -1,7 +1,6 @@
 import {
   IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsObject,
   IsOptional,
   IsString,
@@ -30,10 +29,8 @@ export class CreateDTO {
   @IsNotEmpty()
   duration_work: string;
 
-  @IsNumber()
   @IsNotEmpty()
-  @IsOptional()
-  price?: number;
+  price: number;
 
   @IsEnum(Format)
   @IsNotEmpty()
