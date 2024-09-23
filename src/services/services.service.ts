@@ -3,6 +3,7 @@ import AbstractRepository from '@app/common/database/abstract.repository';
 import {
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -15,6 +16,7 @@ import { ServicesDocument } from './services.schema';
 export class ServicesService extends AbstractRepository<ServicesDocument> {
   constructor(
     @InjectModel(ServicesDocument.name)
+    protected readonly logger: Logger,
     protected readonly model: Model<ServicesDocument>,
     protected readonly cloudinary: CloudinaryService,
     protected readonly translations: Translations,
@@ -26,6 +28,12 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
     data: CreateDTO,
     file: Express.Multer.File,
   ): Promise<ServicesDocument> {
+    if (typeof data.price === 'string') {
+      this.logger.log('is string');
+    } else if (typeof data.price === 'number') {
+      this.logger.log('is number');
+    }
+
     const fieldsToTranslate = {
       title: data.title,
       result: data.result,
