@@ -31,8 +31,8 @@ export class CreateDTO {
   @IsNotEmpty()
   duration_work: string;
 
-  @Transform(({ value }) => Number(value))
-  @IsNumber()
+  @Transform(({ value }) => parseFloat(value))
+  @IsNumber({}, { message: 'Price must be a valid number' })
   @IsNotEmpty()
   price: number;
 

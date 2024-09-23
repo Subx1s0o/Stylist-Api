@@ -44,7 +44,7 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
 
     const newService = {
       ...translatedFields,
-      price: Number(data.price),
+      price: data.price,
       format: data.format,
       category: data.category,
       stages: translatedStages,
@@ -101,7 +101,7 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
     const updatedService: any = {
       ...existingService.toObject(),
       ...translatedFields,
-      price: Number(data.price) || existingService.price,
+      price: data.price || existingService.price,
       format: data.format || existingService.format,
       category: data.category || existingService.category,
       stages: translatedStages,
