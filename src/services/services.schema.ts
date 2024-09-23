@@ -26,8 +26,8 @@ export class ServicesDocument extends Document {
   @Prop({ type: Map, of: String, required: true })
   result: Map<string, string>;
 
-  @Prop({ type: Number, required: false })
-  price?: number;
+  @Prop({ type: Number, required: true })
+  price: number;
 
   @Prop({ type: String, enum: ['online', 'offline'], required: true })
   format: 'online' | 'offline';
