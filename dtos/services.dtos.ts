@@ -1,8 +1,6 @@
-import { Transform } from 'class-transformer';
 import {
   IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsObject,
   IsOptional,
   IsString,
@@ -31,10 +29,8 @@ export class CreateDTO {
   @IsNotEmpty()
   duration_work: string;
 
-  @Transform(({ value }) => parseFloat(value))
-  @IsNumber({}, { message: 'Price must be a valid number' })
   @IsNotEmpty()
-  price: number;
+  price: string;
 
   @IsEnum(Format)
   @IsNotEmpty()

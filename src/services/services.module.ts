@@ -5,7 +5,6 @@ import Translations from 'utils/translations';
 import { ServicesController } from './services.controller';
 import { ServicesDocument, ServicesSchema } from './services.schema';
 import { ServicesService } from './services.service';
-
 @Module({
   imports: [
     MongooseModule.forFeature([
