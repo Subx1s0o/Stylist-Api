@@ -1,6 +1,8 @@
+import { Transform } from 'class-transformer';
 import {
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsObject,
   IsOptional,
   IsString,
@@ -29,6 +31,8 @@ export class CreateDTO {
   @IsNotEmpty()
   duration_work: string;
 
+  @Transform(({ value }) => parseFloat(value))
+  @IsNumber()
   @IsNotEmpty()
   price: number;
 
