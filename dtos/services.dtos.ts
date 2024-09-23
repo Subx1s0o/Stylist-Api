@@ -31,7 +31,7 @@ export class CreateDTO {
   @IsNotEmpty()
   duration_work: string;
 
-  @Transform(({ value }) => parseFloat(value))
+  @Transform(({ value }) => Number(value))
   @IsNumber()
   @IsNotEmpty()
   price: number;
