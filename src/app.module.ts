@@ -5,6 +5,7 @@ import { ContactsModule } from './contacts/contacts.module';
 import { ServicesModule } from './services/services.module';
 
 import { AdminModule } from './admin/admin.module';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     DatabaseModule,
@@ -12,6 +13,7 @@ import { AdminModule } from './admin/admin.module';
     BotModule,
     ContactsModule,
     AdminModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

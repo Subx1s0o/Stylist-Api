@@ -9,7 +9,7 @@ import {
 export default class CloudinaryService {
   async uploadServicePhoto(
     file: Express.Multer.File,
-    productId: string,
+    serviceId: string,
     folder: string,
   ): Promise<UploadApiResponse | UploadApiErrorResponse> {
     if (!file || !file.buffer) {
@@ -17,7 +17,7 @@ export default class CloudinaryService {
     }
 
     try {
-      const fileName = `${productId}`;
+      const fileName = `${serviceId}`;
 
       return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(

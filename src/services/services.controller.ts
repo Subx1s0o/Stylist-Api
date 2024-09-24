@@ -9,10 +9,12 @@ import {
   Post,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateDTO } from 'dtos/services.dtos';
+import { JwtAuthGuard } from 'src/admin/auth.guard';
 import { ServicesService } from './services.service';
 
 @Controller('services')
@@ -22,6 +24,7 @@ export class ServicesController {
     protected readonly cloudinary: CloudinaryService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async addService(
@@ -35,6 +38,7 @@ export class ServicesController {
     return this.servicesService.createService(createDto, file);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('file'))
   async updateService(
