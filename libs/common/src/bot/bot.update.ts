@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Ctx, Hears, On, Start, Update } from 'nestjs-telegraf';
+import { Action, Ctx, On, Start, Update } from 'nestjs-telegraf';
 import { AdminService } from 'src/admin/admin.service';
-import { Context } from 'telegraf';
+import { Context, Markup } from 'telegraf';
 
 @Injectable()
 @Update()
@@ -18,12 +18,16 @@ export class BotUpdate {
   async sayWelcome(@Ctx() ctx: Context) {
     ctx.reply(
       'Привіт Маруся, вітаю тебе!, це початок нашої плідної співпраці!',
+      Markup.inlineKeyboard([
+        Markup.button.callback('Авторизуватися', 'AUTH_COMMAND'),
+      ]),
     );
   }
 
-  @Hears('login')
+  @Action('AUTH_COMMAND')
   async startLogin(@Ctx() ctx: Context) {
-    const chatId = ctx.message.chat.id;
+    const chatId = ctx.from.id;
+    await ctx.answerCbQuery();
     const isAuthorized = await this.adminService.isAuthorized(chatId);
 
     if (isAuthorized) {
@@ -68,7 +72,12 @@ export class BotUpdate {
           this.chatTempUsername.delete(chatId);
         }
       } else {
-        await ctx.reply('Будь ласка введіть "login" для аутентифікації');
+        await ctx.reply(
+          'Будь ласка натисніть кнопку для аутентифікації',
+          Markup.inlineKeyboard([
+            Markup.button.callback('Авторизуватися', 'AUTH_COMMAND'),
+          ]),
+        );
       }
     }
   }
