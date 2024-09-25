@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -47,6 +48,12 @@ export class ServicesController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     return this.servicesService.updateService(id, createDto, file);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async deleteService(@Param('id') id: string) {
+    return await this.servicesService.deleteOne({ _id: id });
   }
 
   @Get('makeup')
