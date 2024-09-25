@@ -17,7 +17,7 @@ export class BotUpdate {
   @Start()
   async sayWelcome(@Ctx() ctx: Context) {
     ctx.reply(
-      'Привіт Маруся, вітаю тебе!, це початок нашої плідної співпраці!',
+      'Привіт Маруся, вітаю тебе!, це початок нашої плідної співпраці!😊',
       Markup.inlineKeyboard([
         Markup.button.callback('Авторизуватися', 'AUTH_COMMAND'),
       ]),
@@ -36,7 +36,7 @@ export class BotUpdate {
     }
 
     this.chatState.set(chatId, 'awaiting_username');
-    await ctx.reply('Введіть логін.');
+    await ctx.reply('Введи у чат логін🤫');
   }
 
   @On('text')
@@ -52,7 +52,7 @@ export class BotUpdate {
       if (state === 'awaiting_username') {
         this.chatTempUsername.set(chatId, userText);
         this.chatState.set(chatId, 'awaiting_password');
-        await ctx.reply('Введіть пароль.');
+        await ctx.reply('Введи у чат пароль🫣');
       } else if (state === 'awaiting_password') {
         const username = this.chatTempUsername.get(chatId);
         const password = userText;
@@ -64,16 +64,24 @@ export class BotUpdate {
         );
 
         if (admin) {
-          await ctx.reply('Успішно аутентифіковано).');
+          await ctx.reply(
+            '<b>Успішно Авторизовано!</b>, Радий тебе бачити!, Сюди я буду надсилати тобі повідомлення з твого сайту), дочекайся цієї миті😊',
+            { parse_mode: 'HTML' },
+          );
           this.chatState.set(chatId, 'authorized');
         } else {
-          await ctx.reply('Помилка аутентифікації, спробуйте ще раз');
+          await ctx.reply(
+            'Помилка аутентифікації, спробуй ще раз🙁',
+            Markup.inlineKeyboard([
+              Markup.button.callback('Авторизуватися', 'AUTH_COMMAND'),
+            ]),
+          );
           this.chatState.delete(chatId);
           this.chatTempUsername.delete(chatId);
         }
       } else {
         await ctx.reply(
-          'Будь ласка натисніть кнопку для аутентифікації',
+          'Будь ласка натисни кнопку для аутентифікації😊',
           Markup.inlineKeyboard([
             Markup.button.callback('Авторизуватися', 'AUTH_COMMAND'),
           ]),
