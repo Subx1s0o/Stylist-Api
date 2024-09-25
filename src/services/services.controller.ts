@@ -14,10 +14,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateDTO } from 'dtos/services.dtos';
+import { ApiTags } from '@nestjs/swagger';
+import { CreateDTO } from 'dtos/create.dto';
 import { JwtAuthGuard } from 'src/admin/auth.guard';
 import { ServicesService } from './services.service';
 
+@ApiTags('Services')
 @Controller('services')
 export class ServicesController {
   constructor(

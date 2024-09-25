@@ -7,11 +7,14 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ChangePasswordDTO } from 'dtos/changePassword.dto';
 import { loginDTO } from 'dtos/login.dto';
 import { RefreshDTO } from 'dtos/refresh.dto';
 import { JwtAuthGuard } from 'src/admin/auth.guard';
 import { AuthService } from './auth.service';
+
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

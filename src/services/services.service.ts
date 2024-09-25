@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateDTO } from 'dtos/services.dtos';
+import { CreateDTO } from 'dtos/create.dto';
 import { Model } from 'mongoose';
 import Translations from 'utils/translations';
 import { ServicesDocument } from './services.schema';

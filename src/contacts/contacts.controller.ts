@@ -1,13 +1,17 @@
 import {
   Body,
   Controller,
+  HttpStatus,
   InternalServerErrorException,
   Post,
 } from '@nestjs/common';
+import { ApiHeader, ApiTags } from '@nestjs/swagger';
+import { ContactsDTO } from 'dtos/contacts.dto';
 import { InjectBot } from 'nestjs-telegraf';
 import { AdminService } from 'src/admin/admin.service';
 import { Context, Telegraf } from 'telegraf';
 
+@ApiTags('Contacts')
 @Controller('contacts')
 export class ContactsController {
   constructor(
@@ -16,7 +20,7 @@ export class ContactsController {
   ) {}
 
   @Post()
-  async sendFormData(@Body() data) {
+  async sendFormData(@Body() data: ContactsDTO) {
     try {
       const chatIds = await this.adminService.findAllChatIds();
       await Promise.all(
@@ -29,11 +33,13 @@ export class ContactsController {
           );
         }),
       );
+
       return {
-        status: 201,
-        message: 'Successfully sended',
+        status: HttpStatus.CREATED,
+        message: 'The request was successfully sended',
       };
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(
         'Error while sending message, please try later.',
       );
