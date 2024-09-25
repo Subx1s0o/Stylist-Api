@@ -16,7 +16,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateDTO } from 'dtos/create.dto';
-import { JwtAuthGuard } from 'src/admin/auth.guard';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ServicesService } from './services.service';
 
 @ApiTags('Services')

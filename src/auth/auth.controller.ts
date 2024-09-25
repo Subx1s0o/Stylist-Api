@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -11,7 +12,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ChangePasswordDTO } from 'dtos/changePassword.dto';
 import { loginDTO } from 'dtos/login.dto';
 import { RefreshDTO } from 'dtos/refresh.dto';
-import { JwtAuthGuard } from 'src/admin/auth.guard';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { AuthService } from './auth.service';
 
 @ApiTags('Auth')
@@ -36,5 +37,12 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async changePassword(@Body() data: ChangePasswordDTO, @Req() req: Request) {
     return await this.authService.changePassword(data, req['jwt_payload'].id);
+  }
+
+  @Get('logged')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async isLogged(@Req() req: Request) {
+    return await this.authService.isLogged(req['jwt_payload'].id);
   }
 }

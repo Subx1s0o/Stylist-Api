@@ -39,7 +39,9 @@ export class AuthService {
   }
 
   async login(data: loginDTO) {
-    const admin = await this.adminModel.findOne({ username: data.login });
+    const admin = await this.adminModel
+      .findOne({ username: data.login })
+      .lean();
     if (!admin) throw new UnauthorizedException('Wrong login or password');
 
     const validPassword = await bcrypt.compare(data.password, admin.password);
@@ -101,5 +103,16 @@ export class AuthService {
       { status: HttpStatus.OK, message: 'Password was successfully changed' },
       HttpStatus.OK,
     );
+  }
+
+  async isLogged(id: string) {
+    const admin = this.adminModel.findById(id).lean();
+
+    if (!admin)
+      throw new UnauthorizedException('The token is wrong or expired');
+
+    return {
+      isLogged: true,
+    };
   }
 }
