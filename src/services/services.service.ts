@@ -38,11 +38,12 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
       fieldsToTranslate,
       {},
     );
+    let translatedStages = {};
 
-    const stages = JSON.parse(data.stages)
-    const translatedStages = await this.translations.translateStages(
-      stages
-    );
+    if (data.stages) {
+      const stages = JSON.parse(data.stages);
+      translatedStages = await this.translations.translateStages(stages);
+    }
 
     const newService = {
       ...translatedFields,

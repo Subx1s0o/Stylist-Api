@@ -24,8 +24,8 @@ export class ServicesController {
     protected readonly cloudinary: CloudinaryService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Post()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async addService(
     @UploadedFile() file: Express.Multer.File,
@@ -38,8 +38,8 @@ export class ServicesController {
     return this.servicesService.createService(createDto, file);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async updateService(
     @Param('id') id: string,

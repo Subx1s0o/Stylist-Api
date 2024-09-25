@@ -14,9 +14,12 @@ export class AuthService {
   ) {}
 
   async refresh(refreshToken: string) {
-    const admin = await this.jwtService.verify(refreshToken);
-    if (!admin)
+    let admin;
+    try {
+      admin = await this.jwtService.verify(refreshToken);
+    } catch (error) {
       throw new UnauthorizedException('Refresh token is wrong or expired');
+    }
 
     const accessToken = this.jwtService.sign(
       { id: admin.id },
