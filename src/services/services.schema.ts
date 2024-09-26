@@ -47,6 +47,11 @@ export class ServicesDocument extends Document {
 
   @Prop({ type: String, required: false })
   imageUrl: string;
+
+  @Prop({ type: Date, required: true })
+  createdAt: Date;
+  @Prop({ type: Date, required: true })
+  updatedAt: Date;
 }
 
 export const ServicesSchema = SchemaFactory.createForClass(ServicesDocument);

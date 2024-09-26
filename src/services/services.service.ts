@@ -52,6 +52,8 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
       category: data.category,
       stages: translatedStages,
       imageUrl: '',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     const createdService = await this.model.create(newService);
@@ -108,6 +110,7 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
       format: data.format || existingService.format,
       category: data.category || existingService.category,
       stages: translatedStages,
+      updatedAt: new Date(),
     };
 
     if (file && file.buffer) {
