@@ -8,6 +8,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin: ['http://localhost:3000', 'https://stylist-marina.vercel.app'],
+    credentials: true,
   });
   const port = process.env.PORT || 8080;
   const config = new DocumentBuilder()
