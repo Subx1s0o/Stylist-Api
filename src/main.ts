@@ -7,7 +7,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://stylist-marina.vercel.app'],
+    origin: [
+      'http://localhost:3000',
+      'https://stylist-marina.vercel.app',
+      'https://stylist-marusya-admin.vercel.app',
+    ],
     credentials: true,
   });
   const port = process.env.PORT || 8080;
