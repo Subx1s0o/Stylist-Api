@@ -24,8 +24,9 @@ export default class CloudinaryService {
           {
             folder: folder,
             public_id: fileName,
-            quality: 'auto',
+            quality: 'auto:good',
             fetch_format: 'auto',
+            format: 'avif',
           },
           (error, result) => {
             if (error) {
@@ -38,7 +39,17 @@ export default class CloudinaryService {
           },
         );
 
-        toStream(file.buffer).pipe(uploadStream);
+        const readableStream = toStream(file.buffer);
+        readableStream.on('error', (streamError) => {
+          console.error('Stream error:', streamError);
+          return reject(
+            new InternalServerErrorException(
+              'Stream error occurred during file upload',
+            ),
+          );
+        });
+
+        readableStream.pipe(uploadStream);
       });
     } catch (error) {
       throw new InternalServerErrorException('Error uploading file');
