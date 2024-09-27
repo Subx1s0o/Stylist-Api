@@ -33,7 +33,7 @@ export class CreateDTO {
   @ApiProperty({
     description: 'Duration work of Service',
     example: '2 неділі',
-    required: true,
+    required: false,
   })
   @IsString()
   @IsOptional()
