@@ -36,7 +36,7 @@ export class CreateDTO {
     required: true,
   })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   duration_work: string;
 
   @ApiProperty({

@@ -20,7 +20,7 @@ export class ServicesDocument extends Document {
   @Prop({ type: Map, of: String, required: true })
   duration_consultation: Map<string, string>;
 
-  @Prop({ type: Map, of: String, required: true })
+  @Prop({ type: Map, of: String, required: false })
   duration_work: Map<string, string>;
 
   @Prop({ type: Map, of: String, required: true })
