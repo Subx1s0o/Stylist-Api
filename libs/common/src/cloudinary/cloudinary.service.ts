@@ -58,7 +58,7 @@ export default class CloudinaryService {
 
   async deleteServicePhoto(id: string): Promise<void> {
     try {
-      await cloudinary.uploader.destroy(id);
+      await cloudinary.api.delete_resources([id]);
     } catch (error) {
       throw new InternalServerErrorException('Error deleting file');
     }

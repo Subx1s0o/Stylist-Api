@@ -99,16 +99,19 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
       fieldsToTranslate,
       existingService,
     );
-    const translatedStages = data.stages
-      ? await this.translations.translateStages(data.stages)
-      : existingService.stages;
+
+    let translatedStages = {};
+
+    if (data.stages) {
+      const stages = JSON.parse(data.stages);
+      translatedStages = await this.translations.translateStages(stages);
+    }
 
     const updatedService: any = {
       ...existingService.toObject(),
       ...translatedFields,
-      price: parseFloat(data.price) || existingService.price,
-      format: data.format || existingService.format,
-      category: data.category || existingService.category,
+      price: parseFloat(data.price),
+      format: data.format,
       stages: translatedStages,
       updatedAt: new Date(),
     };
@@ -150,5 +153,17 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
     }
 
     return updated;
+  }
+
+  async delete(id: string) {
+    const existingService = await this.model.findById(id).lean().exec();
+    const publicId = existingService.imageUrl
+      .split('/')
+      .pop()
+      ?.split('.')
+      .shift();
+    const fileName = `services/${publicId}`;
+    await this.cloudinary.deleteServicePhoto(fileName);
+    await this.deleteOne({ _id: id });
   }
 }

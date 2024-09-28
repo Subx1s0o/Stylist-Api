@@ -55,7 +55,7 @@ export class ServicesController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deleteService(@Param('id') id: string) {
-    return await this.servicesService.deleteOne({ _id: id });
+    return await this.servicesService.delete(id);
   }
 
   @Get('makeup')
