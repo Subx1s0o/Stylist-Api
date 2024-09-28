@@ -1,26 +1,35 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import * as toStream from 'buffer-to-stream';
 import {
   UploadApiErrorResponse,
   UploadApiResponse,
   v2 as cloudinary,
 } from 'cloudinary';
+
 @Injectable()
 export default class CloudinaryService {
-  async uploadServicePhoto(
-    file: Express.Multer.File,
-    serviceId: string,
+  async uploadPhoto(
+    image: string,
+    id: string,
     folder: string,
   ): Promise<UploadApiResponse | UploadApiErrorResponse> {
-    if (!file || !file.buffer) {
-      throw new Error('File buffer is missing');
+    if (!image) {
+      throw new Error('Base64 image is missing');
     }
 
     try {
-      const fileName = `${serviceId}`;
+      const matches = image.match(/^data:(image\/\w+);base64,(.+)$/);
+      if (!matches) {
+        throw new Error('Invalid Base64 image format');
+      }
+
+      const mimeType = matches[1];
+      const base64Data = matches[2];
+
+      const fileName = `${id}`;
 
       return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
+        cloudinary.uploader.upload(
+          `data:${mimeType};base64,${base64Data}`,
           {
             folder: folder,
             public_id: fileName,
@@ -38,25 +47,13 @@ export default class CloudinaryService {
             resolve(result);
           },
         );
-
-        const readableStream = toStream(file.buffer);
-        readableStream.on('error', (streamError) => {
-          console.error('Stream error:', streamError);
-          return reject(
-            new InternalServerErrorException(
-              'Stream error occurred during file upload',
-            ),
-          );
-        });
-
-        readableStream.pipe(uploadStream);
       });
     } catch (error) {
       throw new InternalServerErrorException('Error uploading file');
     }
   }
 
-  async deleteServicePhoto(id: string): Promise<void> {
+  async deletePhoto(id: string): Promise<void> {
     try {
       await cloudinary.api.delete_resources([id]);
     } catch (error) {

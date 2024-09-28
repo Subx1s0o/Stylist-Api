@@ -9,7 +9,7 @@ import { BotUpdate } from './bot.update';
     TelegrafModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
-        token: config.get<string>('TG_TOKEN'),
+        token: config.get<string>('TEST_TG_TOKEN'),
       }),
       inject: [ConfigService],
     }),

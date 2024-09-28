@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 enum Format {
   ONLINE = 'online',
@@ -20,6 +27,14 @@ export class CreateDTO {
   @IsString()
   @IsNotEmpty()
   title: string;
+
+  @ApiProperty({
+    description: 'base64 coded image',
+    required: true,
+  })
+  @IsString()
+  @IsNotEmpty()
+  image: string;
 
   @ApiProperty({
     description: 'Duration consultation of Service',
@@ -44,9 +59,9 @@ export class CreateDTO {
     example: '122',
     required: true,
   })
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  price: string;
+  price: number;
 
   @ApiProperty({
     description: 'Format of Service',
@@ -88,11 +103,17 @@ export class CreateDTO {
   attention?: string;
 
   @ApiProperty({
-    description: 'Need provide JSON string. Stages have numbers from 1 to 6',
-    example: '{"1":"перший етап", "2":"другий етап"}',
-    required: false,
+    description: 'Stages of work',
+    example: '{1:"перший етап", 2:"другий етап"}',
+    required: true,
   })
-  @IsOptional()
-  @IsString()
-  stages?: string;
+  @IsObject()
+  stages: {
+    1?: string;
+    2?: string;
+    3?: string;
+    4?: string;
+    5?: string;
+    6?: string;
+  };
 }

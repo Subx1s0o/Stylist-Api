@@ -22,10 +22,7 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
     super(model);
   }
 
-  async createService(
-    data: CreateDTO,
-    file: Express.Multer.File,
-  ): Promise<ServicesDocument> {
+  async createService(data: CreateDTO): Promise<ServicesDocument> {
     const fieldsToTranslate = {
       title: data.title,
       result: data.result,
@@ -38,40 +35,37 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
       fieldsToTranslate,
       {},
     );
+
     let translatedStages = {};
 
-    if (data.stages) {
-      const stages = JSON.parse(data.stages);
-      translatedStages = await this.translations.translateStages(stages);
+    if (Object.keys(data.stages).length > 0) {
+      translatedStages = await this.translations.translateStages(data.stages);
     }
 
     const newService = {
       ...translatedFields,
-      price: parseFloat(data.price),
+      price: data.price,
       format: data.format,
       category: data.category,
       stages: translatedStages,
-      imageUrl: '',
+      image: '',
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
     const createdService = await this.model.create(newService);
 
-    if (file && file.buffer) {
-      try {
-        const uploadResult = await this.cloudinary.uploadServicePhoto(
-          file,
-          createdService._id.toString(),
-          'services',
-        );
+    try {
+      const uploadResult = await this.cloudinary.uploadPhoto(
+        data.image,
+        createdService._id.toString(),
+        'services',
+      );
 
-        const imageUrl = uploadResult.secure_url;
-        createdService.imageUrl = imageUrl;
-        await createdService.save();
-      } catch (error) {
-        throw new InternalServerErrorException('Error uploading file');
-      }
+      createdService.image = uploadResult.secure_url;
+      await createdService.save();
+    } catch (error) {
+      throw new InternalServerErrorException('Error uploading file');
     }
 
     return createdService;
@@ -80,7 +74,6 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
   async updateService(
     id: string,
     data: Partial<CreateDTO>,
-    file?: Express.Multer.File,
   ): Promise<ServicesDocument> {
     const existingService = await this.model.findById(id);
     if (!existingService) {
@@ -102,23 +95,22 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
 
     let translatedStages = {};
 
-    if (data.stages) {
-      const stages = JSON.parse(data.stages);
-      translatedStages = await this.translations.translateStages(stages);
+    if (Object.keys(data.stages).length > 0) {
+      translatedStages = await this.translations.translateStages(data.stages);
     }
 
     const updatedService: any = {
       ...existingService.toObject(),
       ...translatedFields,
-      price: parseFloat(data.price),
+      price: data.price,
       format: data.format,
       stages: translatedStages,
       updatedAt: new Date(),
     };
 
-    if (file && file.buffer) {
-      if (existingService.imageUrl) {
-        const publicId = existingService.imageUrl
+    if (data.image) {
+      if (existingService.image) {
+        const publicId = existingService.image
           .split('/')
           .pop()
           ?.split('.')
@@ -127,18 +119,18 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
         const fileName = `services/${publicId}`;
 
         if (fileName) {
-          await this.cloudinary.deleteServicePhoto(fileName);
+          await this.cloudinary.deletePhoto(fileName);
         }
       }
 
       try {
-        const uploadResult = await this.cloudinary.uploadServicePhoto(
-          file,
+        const uploadResult = await this.cloudinary.uploadPhoto(
+          data.image,
           id,
           'services',
         );
 
-        updatedService.imageUrl = uploadResult.secure_url;
+        updatedService.image = uploadResult.secure_url;
       } catch (error) {
         throw new InternalServerErrorException('Error uploading file');
       }
@@ -157,13 +149,14 @@ export class ServicesService extends AbstractRepository<ServicesDocument> {
 
   async delete(id: string) {
     const existingService = await this.model.findById(id).lean().exec();
-    const publicId = existingService.imageUrl
-      .split('/')
-      .pop()
-      ?.split('.')
-      .shift();
+    if (!existingService) {
+      throw new NotFoundException('Service not found');
+    }
+
+    const publicId = existingService.image.split('/').pop()?.split('.').shift();
     const fileName = `services/${publicId}`;
-    await this.cloudinary.deleteServicePhoto(fileName);
+
+    await this.cloudinary.deletePhoto(fileName);
     await this.deleteOne({ _id: id });
   }
 }

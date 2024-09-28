@@ -46,7 +46,7 @@ export class ServicesDocument extends Document {
   stages: Record<number, StageDTO>;
 
   @Prop({ type: String, required: false })
-  imageUrl: string;
+  image: string;
 
   @Prop({ type: Date, required: true })
   createdAt: Date;

@@ -35,10 +35,12 @@ export default class Translations {
     }
 
     for (const [key, stage] of Object.entries(stages)) {
-      const { uk, en } = await this.translate(stage);
-      translatedStages[Number(key)] = { uk, en };
+      if (stage) {
+        const { uk, en } = await this.translate(stage);
+        translatedStages[Number(key)] = { uk, en };
+      }
     }
-
+    console.log(translatedStages);
     return translatedStages;
   }
 

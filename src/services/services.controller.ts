@@ -1,6 +1,5 @@
 import CloudinaryService from '@app/common/cloudinary/cloudinary.service';
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,11 +8,8 @@ import {
   Patch,
   Post,
   Query,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateDTO } from 'dtos/create.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
@@ -29,27 +25,14 @@ export class ServicesController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
-  async addService(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() createDto: CreateDTO,
-  ) {
-    if (!file) {
-      throw new BadRequestException('File is missing');
-    }
-
-    return this.servicesService.createService(createDto, file);
+  async addService(@Body() createDto: CreateDTO) {
+    return this.servicesService.createService(createDto);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
-  async updateService(
-    @Param('id') id: string,
-    @Body() createDto: CreateDTO,
-    @UploadedFile() file?: Express.Multer.File,
-  ) {
-    return this.servicesService.updateService(id, createDto, file);
+  async updateService(@Param('id') id: string, @Body() createDto: CreateDTO) {
+    return this.servicesService.updateService(id, createDto);
   }
 
   @UseGuards(JwtAuthGuard)
