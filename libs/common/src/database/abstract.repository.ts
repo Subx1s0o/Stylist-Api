@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { Document, FilterQuery, Model, Types } from 'mongoose';
+import { Document, FilterQuery, Model } from 'mongoose';
 
 export default abstract class AbstractRepository<TDocument extends Document> {
   constructor(protected readonly model: Model<TDocument>) {}
@@ -10,10 +10,7 @@ export default abstract class AbstractRepository<TDocument extends Document> {
   }
 
   async create(document: Partial<Omit<TDocument, '_id'>>): Promise<TDocument> {
-    const createdDocument = new this.model({
-      ...document,
-      _id: new Types.ObjectId(),
-    });
+    const createdDocument = new this.model(document);
     return this.removeVersionField(
       (await createdDocument.save()).toJSON() as unknown as TDocument,
     );
@@ -32,14 +29,14 @@ export default abstract class AbstractRepository<TDocument extends Document> {
     page: number = 1,
     limit: number = 10,
   ): Promise<{
-    services: TDocument[];
+    data: TDocument[];
     total: number;
     totalPages: number;
   }> {
     try {
       const skip = (page - 1) * limit;
 
-      const [services, total] = await Promise.all([
+      const [data, total] = await Promise.all([
         this.model.find(filterQuery).skip(skip).limit(limit).lean(),
         this.model.countDocuments(filterQuery),
       ]);
@@ -47,12 +44,12 @@ export default abstract class AbstractRepository<TDocument extends Document> {
       const totalPages = Math.ceil(total / limit);
 
       return {
-        services: services.map(this.removeVersionField) as TDocument[],
+        data: data.map(this.removeVersionField) as TDocument[],
         total,
         totalPages,
       };
     } catch (error) {
-      throw new Error('An error occurred while fetching services');
+      throw new Error('An error occurred while fetching data');
     }
   }
 
