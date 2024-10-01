@@ -15,13 +15,17 @@ export class PortfolioService extends AbstractRepository<PortfolioDocument> {
   }
 
   async addImage(image: string) {
-    const document = await this.model.create({ image: '' });
-
-    const uploaded_image = await this.cloudinary.uploadPhoto(
-      image,
-      document._id.toString(),
-      'portfolio',
-    );
+    const document = await this.model.create({ image: 'future_image' });
+    let uploaded_image;
+    try {
+      uploaded_image = await this.cloudinary.uploadPhoto(
+        image,
+        document._id.toString(),
+        'portfolio',
+      );
+    } catch (error) {
+      await this.model.deleteOne({ _id: document._id });
+    }
 
     document.image = uploaded_image.secure_url;
     await document.save();
