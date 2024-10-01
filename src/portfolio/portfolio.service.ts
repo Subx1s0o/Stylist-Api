@@ -15,7 +15,7 @@ export class PortfolioService extends AbstractRepository<PortfolioDocument> {
   }
 
   async addImage(image: string) {
-    const document = await this.model.create({ image: image });
+    const document = await this.model.create({ image: '' });
 
     const uploaded_image = await this.cloudinary.uploadPhoto(
       image,
@@ -23,11 +23,7 @@ export class PortfolioService extends AbstractRepository<PortfolioDocument> {
       'portfolio',
     );
 
-    document.image = uploaded_image.toString();
+    document.image = uploaded_image.secure_url;
     await document.save();
-  }
-
-  async getAllImages(data: { page: number; limit: number }) {
-    return this.findAll(data);
   }
 }

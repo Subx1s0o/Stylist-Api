@@ -7,10 +7,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import PortfolioDTO from 'dtos/portfolio.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { PortfolioService } from './portfolio.service';
 
+@ApiTags('Portfolio')
 @Controller('portfolio')
 export class PortfolioController {
   constructor(private readonly portfolioService: PortfolioService) {}
@@ -26,7 +28,7 @@ export class PortfolioController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) {
-    return this.portfolioService.getAllImages({ page, limit });
+    return this.portfolioService.findAll(null, page, limit);
   }
 
   @Delete()
